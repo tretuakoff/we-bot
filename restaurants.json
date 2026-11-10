@@ -1,6 +1,23 @@
 [
-  {"slug": "restoran1", "name": "Ресторан 1", "system": "iiko",
-   "twogis_branch_id": "",
-   "settings": {"vip_tables": [], "vip_dish": "", "takeaway_section": "", "hall_sections": [], "fee_exempt": [], "routine_pairs": []}},
-  {"slug": "restoran2", "name": "Ресторан 2", "system": "rkeeper", "active": false}
+  {
+    "slug": "restoran1",
+    "name": "Ресторан 1",
+    "system": "iiko",
+    "active": false,
+    "twogis_branch_id": "",
+    "settings": {
+      "vip_tables": [],
+      "vip_dish": "",
+      "takeaway_section": "",
+      "hall_sections": [],
+      "fee_exempt": [],
+      "routine_pairs": []
+    }
+  },
+  {
+    "slug": "restoran2",
+    "name": "Ресторан 2",
+    "system": "rkeeper",
+    "active": false
+  }
 ]
