@@ -58,7 +58,10 @@ def handle(u):
     chat = m['chat']['id']; text = (m.get('text') or '').strip(); frm = m.get('from', {})
     if 'contact' in m:
         c = m['contact']; ph = tg.norm_phone(c.get('phone_number', ''))
-        if c.get('user_id') != frm.get('id'): return reply(chat, 'Поделитесь <b>своим</b> номером кнопкой ниже.')
+        masked = ph[:4] + '*****' + ph[-2:]
+        if c.get('user_id') != frm.get('id'):
+            print(f'контакт {masked}: чужой номер, не принят'); return reply(chat, 'Поделитесь <b>своим</b> номером кнопкой ниже.')
+        print(f'контакт {masked}: ' + ('принят' if ph in [tg.norm_phone(x) for x in ALLOWED_PHONES] else 'нет в списке получателей'))
         if ph in [tg.norm_phone(x) for x in ALLOWED_PHONES]:
             new = ph not in tg.recipients()
             tg.save_recipient(ph, chat)
@@ -73,6 +76,7 @@ def handle(u):
         tg.save_recipient('tg_' + uname, chat)
         return reply(chat, f'✅ Готово. Вы подключены, отчёты сети {esc(NETWORK)} будут приходить сюда.\n\n' + HELP, {'remove_keyboard': True})
     if text.startswith('/start'):
+        print('сообщение /start: просим поделиться номером')
         return reply(chat, f'Здравствуйте! Чтобы получать отчёты сети {esc(NETWORK)}, подтвердите номер телефона.',
                      {'keyboard': [[{'text': '📱 Поделиться номером', 'request_contact': True}]], 'resize_keyboard': True, 'one_time_keyboard': True})
     ph = phone_of(chat)
