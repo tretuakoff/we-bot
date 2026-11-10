@@ -50,6 +50,10 @@ IIKO_LOGIN = _ACC.get('login') or os.environ.get('IIKO_LOGIN', '')
 IIKO_PASSWORD = _ACC.get('password') or os.environ.get('IIKO_PASSWORD', '')
 TG_TOKEN = os.environ.get('TG_TOKEN', '').strip()
 ALLOWED_PHONES = [p.strip() for p in os.environ.get('ALLOWED_PHONES', '').split(',') if p.strip()]
+# дополнительный список получателей в репозитории: по номеру в строке, после # — комментарий
+_PHONES_FILE = ROOT / 'allowed_phones.txt'
+if _PHONES_FILE.exists():
+    ALLOWED_PHONES += [l.split('#')[0].strip() for l in _PHONES_FILE.read_text(encoding='utf-8').splitlines() if l.split('#')[0].strip()]
 ALLOWED_USERNAMES = [u.strip().lstrip('@').lower() for u in os.environ.get('ALLOWED_USERNAMES', '').split(',') if u.strip()]
 TWOGIS_BRANCH_ID = str(_R.get('twogis_branch_id') or '').strip()
 TWOGIS_KEY = '6e7e1929-4ea9-4a5d-8c05-d601860389bd'   # публичный ключ веб-виджета 2ГИС
