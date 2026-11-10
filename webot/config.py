@@ -27,8 +27,24 @@ RESTAURANT_CFG = _R
 SYSTEM = _R.get('system', 'iiko')
 if SLUG:   # у каждого ресторана своя папка данных
     DATA_DIR = DATA_DIR / SLUG; DATA_DIR.mkdir(parents=True, exist_ok=True)
-# логины iiko всех ресторанов — один секрет IIKO_ACCOUNTS: {"slug": {"url": "...", "login": "...", "password": "..."}}
-_ACC = (json.loads(os.environ.get('IIKO_ACCOUNTS') or '{}') or {}).get(SLUG, {})
+def _parse_accounts(raw):
+    """Секрет IIKO_ACCOUNTS: по строке на ресторан «имя адрес логин пароль» или JSON {"имя": {"url", "login", "password"}}.
+    Ошибка в секрете не ломает бота: регистрация получателей работает, а ресторан сообщает, что не так."""
+    raw = (raw or '').strip()
+    if not raw: return {}, ''
+    if raw.startswith('{'):
+        try: return json.loads(raw), ''
+        except Exception as e: return {}, f'секрет IIKO_ACCOUNTS не читается как JSON ({getattr(e, "msg", e)}, символ {getattr(e, "pos", "?")}). Проще записать по строке на ресторан: имя адрес логин пароль'
+    out = {}
+    for line in raw.splitlines():
+        parts = line.strip().split(None, 3)
+        if not parts or parts[0].startswith('#'): continue
+        if len(parts) < 4: return out, f'строка «{parts[0]} …» в секрете IIKO_ACCOUNTS: нужно 4 части через пробел — имя, адрес, логин, пароль'
+        url = parts[1] if parts[1].startswith('http') else 'https://' + parts[1]
+        out[parts[0]] = {'url': url, 'login': parts[2], 'password': parts[3]}
+    return out, ''
+IIKO_ACCOUNTS_MAP, ACCOUNTS_ERROR = _parse_accounts(os.environ.get('IIKO_ACCOUNTS'))
+_ACC = IIKO_ACCOUNTS_MAP.get(SLUG, {})
 IIKO_URL = (_ACC.get('url') or os.environ.get('IIKO_URL', '')).rstrip('/')
 IIKO_LOGIN = _ACC.get('login') or os.environ.get('IIKO_LOGIN', '')
 IIKO_PASSWORD = _ACC.get('password') or os.environ.get('IIKO_PASSWORD', '')

@@ -74,7 +74,7 @@ def main():
     if RESTAURANTS and not SLUG: print('Укажите --restaurant <slug> или --all. Рестораны: ' + ', '.join(r['slug'] for r in RESTAURANTS)); sys.exit(2)
     if SLUG and not RESTAURANT_CFG: print(f'Ресторан {SLUG} не найден в {RESTAURANTS_FILE.name}'); sys.exit(2)
     if SYSTEM != 'iiko': print(f'{RESTAURANT}: {SYSTEM} подключается отдельным агентом в ресторане — пока пропускаю'); return
-    if not IIKO_URL: print(f'{RESTAURANT}: нет адреса iiko в секрете IIKO_ACCOUNTS'); sys.exit(1)
+    if not IIKO_URL: print(f'{RESTAURANT}: ' + (ACCOUNTS_ERROR or f'нет строки «{SLUG}» в секрете IIKO_ACCOUNTS')); sys.exit(1)
     d = parse_date(a.date) if a.date else yesterday()
     if a.cmd == 'list': print('\n'.join(f'{c:10} {t}' for c, (t, _) in REPORTS.items()) + '\nweekly / monthly / reviews / morning'); return
     with Iiko() as k:
