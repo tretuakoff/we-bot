@@ -60,8 +60,12 @@ def handle(u):
         c = m['contact']; ph = tg.norm_phone(c.get('phone_number', ''))
         if c.get('user_id') != frm.get('id'): return reply(chat, 'Поделитесь <b>своим</b> номером кнопкой ниже.')
         if ph in [tg.norm_phone(x) for x in ALLOWED_PHONES]:
+            new = ph not in tg.recipients()
             tg.save_recipient(ph, chat)
             reply(chat, f'✅ Готово. Номер подтверждён, отчёты сети {esc(NETWORK)} будут приходить сюда.\n\n' + HELP, {'remove_keyboard': True})
+            if new:      # новый получатель сразу получает пакет за вчера, не дожидаясь утра
+                reply(chat, '⏳ Отправляю отчёты за вчера…')
+                _spawn([sys.executable, 'run.py', 'morning', '--all', '--to', ph, '--force'])
         else: reply(chat, 'Этот номер не в списке получателей. Обратитесь к владельцу.', {'remove_keyboard': True})
         return
     uname = (frm.get('username') or '').lower()
