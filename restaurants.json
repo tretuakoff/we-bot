@@ -7,8 +7,12 @@
     "settings": {
       "vip_tables": [],
       "vip_dish": "",
-      "takeaway_section": "",
-      "hall_sections": [],
+      "takeaway_section": "Вынос",
+      "hall_sections": [
+        "1 Этаж",
+        "2 Этаж",
+        "Летник"
+      ],
       "fee_exempt": [],
       "routine_pairs": []
     }
