@@ -1,7 +1,7 @@
 name: Сообщения боту WE
 on:
   schedule:
-    - cron: '*/10 * * * *'    # каждые 10 минут: /start и команды
+    - cron: '*/30 * * * *'    # каждые 30 минут: /start и команды (чаще — больше минут Actions)
   workflow_dispatch:
 concurrency: {group: we-state, cancel-in-progress: false}
 permissions: {contents: write}

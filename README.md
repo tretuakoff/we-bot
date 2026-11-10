@@ -42,6 +42,7 @@
 2. Получатели открывают бота, нажимают `/start` и «Поделиться номером» (принимаются только номера из `ALLOWED_PHONES`).
 3. Проверка вручную: Actions → «Отчёты WE» → Run workflow → `morning --all --force` или `morning --restaurant restoran1 --date 2026-11-09 --force`.
 
+Сообщения боту обрабатываются раз в 30 минут (`.github/workflows/updates.yml`): так бот укладывается в бесплатные минуты GitHub Actions.
 Команды в чате: `/reports`, `/report deletions [дата] [ресторан]`, `/dashboard [дата] [ресторан]`, `/day [дата] [ресторан]`, `/status`.
 Без ресторана отчёт приходит по всем ресторанам.
 
