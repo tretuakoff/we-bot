@@ -18,6 +18,7 @@ def make(k, end=None, days=45, out=None):
     ds = [x for x in ds if x['orders'] or x['purchases']]
     rv = []
     try:
+        if not TWOGIS_BRANCH_ID: raise LookupError('ID филиала 2ГИС не задан — отзывы пропущены')
         from .reports import reviews as rvm
         items, meta = rvm.fetch(days=days + 5, max_pages=20)
         rv = [dict(d=r['created'].strftime('%Y-%m-%d'), t=r['created'].strftime('%H:%M'), r=r['rating'], a=r['author'], x=r['text']) for r in items]
