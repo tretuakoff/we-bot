@@ -1,9 +1,8 @@
 [
   {
-    "slug": "restoran1",
-    "name": "Ресторан 1",
+    "slug": "rest1",
+    "name": "GASTERIA Кунаева",
     "system": "iiko",
-    "active": false,
     "twogis_branch_id": "",
     "settings": {
       "vip_tables": [],
@@ -13,11 +12,5 @@
       "fee_exempt": [],
       "routine_pairs": []
     }
-  },
-  {
-    "slug": "restoran2",
-    "name": "Ресторан 2",
-    "system": "rkeeper",
-    "active": false
   }
 ]
