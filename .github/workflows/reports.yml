@@ -1,0 +1,46 @@
+name: Отчёты WE
+on:
+  schedule:
+    - cron: '7 4 * * *'       # ~09:07 Алматы — утренний пакет за вчера по всем ресторанам
+    - cron: '37 4 * * *'      # страховка: повтор (уже отправленное не дублируется)
+    - cron: '17 5 * * *'      # страховка 2
+  workflow_dispatch:
+    inputs:
+      cmd: {description: 'Команда run.py (например: morning --date 2026-11-09 --restaurant restoran1 --force)', required: true, default: 'morning --all'}
+concurrency: {group: we-state, cancel-in-progress: false}
+permissions: {contents: write}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      WE_CLOUD: '1'
+      WE_STATE_DIR: ${{ github.workspace }}/persist/state
+      WE_DATA_DIR: ${{ github.workspace }}/persist/data
+      IIKO_ACCOUNTS: ${{ secrets.IIKO_ACCOUNTS }}
+      TG_TOKEN: ${{ secrets.TG_TOKEN }}
+      ALLOWED_PHONES: ${{ secrets.ALLOWED_PHONES }}
+      ALLOWED_USERNAMES: ${{ secrets.ALLOWED_USERNAMES }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: {ref: state, path: persist}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12', cache: pip}
+      - run: pip install -r requirements.txt
+      - name: Определить команду
+        id: cmd
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then C="${{ github.event.inputs.cmd }}"; else C="morning --all"; fi
+          echo "cmd=$C" >> $GITHUB_OUTPUT
+      - name: Регистрации и команды из Telegram
+        run: python poll.py --once || true
+      - name: Запуск
+        run: python run.py ${{ steps.cmd.outputs.cmd }}
+      - name: Сохранить состояние
+        if: always()
+        run: |
+          cd persist
+          git config user.name "we-bot"; git config user.email "we-bot@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then git commit -m "state $(date -u +%F' '%T)"; for i in 1 2 3; do git pull --rebase origin state && git push origin state && break || sleep 5; done; fi

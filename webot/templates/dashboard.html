@@ -1,0 +1,219 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Интерактивный дашборд</title>
+<style>
+:root{--navy:#1F3864;--or:#E8833A;--gr:#2E9E6B;--rd:#D64545;--am:#F2A93B;--tx:#1d2433;--mu:#7A8599;--bg:#F3F5F9;--ln:#DDE2EB}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 -apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx)}
+header{background:var(--navy);color:#fff;padding:14px 20px;position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+header h1{font-size:18px;margin:0}header .sub{color:#C9D3EA;font-size:12px}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+button,.btn{border:1px solid #ffffff55;background:#ffffff14;color:#fff;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px}
+button.on{background:#fff;color:var(--navy);font-weight:600}
+input[type=date],input[type=search]{border:1px solid #ffffff55;background:#ffffff14;color:#fff;border-radius:8px;padding:4px 8px;font-size:13px}
+input[type=search]{min-width:160px}input::placeholder{color:#C9D3EA}
+main{padding:16px 20px;max-width:1500px;margin:auto}
+.chip{display:inline-flex;gap:6px;align-items:center;background:var(--or);color:#fff;border-radius:14px;padding:3px 10px;font-size:12px;margin-left:6px}.chip b{cursor:pointer}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.card{background:#fff;border:1px solid var(--ln);border-left:5px solid var(--navy);border-radius:12px;padding:12px 14px;cursor:pointer;transition:.15s;position:relative}
+.card:hover{box-shadow:0 4px 14px #1f38641f;transform:translateY(-1px)}.card.act{outline:2px solid var(--or)}
+.card h3{margin:0;font-size:12px;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.card .v{font-size:24px;font-weight:700;margin:4px 0}.card .d{font-size:12px}.up{color:var(--gr)}.dn{color:var(--rd)}.nt{color:var(--mu)}
+.card.bad{border-left-color:var(--rd)}.card.warn{border-left-color:var(--am)}.card.ok{border-left-color:var(--gr)}
+.spark{position:absolute;right:10px;bottom:10px;opacity:.85}
+section{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:14px 16px;margin-top:14px}
+section h2{margin:0 0 8px;font-size:16px;color:var(--navy)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}.tabs a{padding:5px 11px;border-radius:14px;background:#EEF1F7;cursor:pointer;font-size:13px}.tabs a.on{background:var(--navy);color:#fff}
+table{border-collapse:collapse;width:100%;font-size:13px}th{text-align:left;color:var(--mu);font-weight:600;padding:6px 8px;border-bottom:2px solid var(--ln);position:sticky;top:0;background:#fff;white-space:nowrap}
+td{padding:6px 8px;border-bottom:1px solid #EEF1F7;vertical-align:top}td.n,th.n{text-align:right;white-space:nowrap}
+tr.exp{cursor:pointer}tr.exp:hover td{background:#F7F9FD}tr.exp>td:first-child::before{content:"▸ ";color:var(--or);font-weight:700}tr.exp.open>td:first-child::before{content:"▾ "}
+tr.det>td{background:#FAFBFE;padding:8px 8px 12px 26px;border-left:3px solid var(--or)}
+.tag{display:inline-block;border-radius:9px;padding:1px 8px;font-size:11px;color:#fff;background:var(--mu);margin-right:3px}.t-r{background:var(--rd)}.t-a{background:var(--am)}.t-g{background:var(--gr)}.t-b{background:#5B7BB8}
+a.doc,a.wt{color:#2a5db0;cursor:pointer;text-decoration:underline dotted}
+.bars{display:flex;align-items:flex-end;gap:3px;height:130px;padding-top:16px}.bars div{flex:1;min-width:6px;background:#9DB2D6;border-radius:3px 3px 0 0;position:relative;cursor:pointer}.bars div:hover{background:var(--or)}
+.bars div span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:10px;color:var(--mu);white-space:nowrap}
+.bars div.cur{background:var(--or)}.bx{display:flex;gap:3px;font-size:10px;color:var(--mu)}.bx div{flex:1;text-align:center;min-width:6px;overflow:hidden}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:flex-start;justify-content:center;padding:30px 10px;z-index:50;overflow:auto}.modal.on{display:flex}
+.modal .box{background:#fff;border-radius:14px;max-width:820px;width:100%;padding:18px 20px;position:relative}.modal .x{position:absolute;right:14px;top:10px;font-size:22px;cursor:pointer;color:var(--mu)}
+.modal h3{margin:0 0 4px;color:var(--navy)}.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px 14px;margin:10px 0;font-size:13px}.kv span{color:var(--mu)}
+.note{color:var(--mu);font-size:12px;margin:6px 0}.hl{background:#FFF3E6}.badrow td{background:#FFF0F0}
+.empty{color:var(--mu);padding:14px 0}
+@media(max-width:640px){main{padding:10px}.card .v{font-size:20px}td,th{padding:5px 4px}}
+</style></head><body>
+<header><div><h1>ХИВА · Интерактивный дашборд</h1><div class="sub" id="sub"></div></div>
+<div class="bar" id="ranges"></div>
+<div class="bar"><input type="date" id="d0"><span>–</span><input type="date" id="d1"><input type="search" id="q" placeholder="Поиск по таблице…"><span id="chips"></span></div></header>
+<main>
+<div class="cards" id="cards"></div>
+<section id="chart"><h2 id="chartTitle"></h2><div class="bars" id="bars"></div><div class="bx" id="bx"></div><div class="note">Нажмите на столбец — период сузится до этого дня.</div></section>
+<section id="detail"></section>
+<div class="note" style="margin:14px 0">Данные iiko. Всё раскрывается: нажмите на строку, чтобы увидеть заказы и накладные, «документ» откроет чек или накладную. Клик по имени официанта фильтрует весь дашборд.</div>
+</main>
+<div class="modal" id="modal"><div class="box"><span class="x" onclick="closeDoc()">×</span><div id="doc"></div></div></div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const DAYS=JSON.parse(document.getElementById('data').textContent),META=__META__;
+const $=s=>document.querySelector(s),fmt=n=>Math.round(+n||0).toLocaleString('ru-RU').replace(/ | /g,' '),money=n=>fmt(n)+' ₸',esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pct=(a,b)=>b?(a/b*100):0,sum=(a,f)=>a.reduce((s,x)=>s+(f?f(x):x),0);
+const WD=['вс','пн','вт','ср','чт','пт','сб'],rus=d=>d.split('-').reverse().join('.');
+const ORD=[],PUR=[],EXPR=[],CASH=[],DNG=[],SHF=[],ACC=[],EDT=[];
+DAYS.forEach(d=>{d.orders.forEach(o=>{o.d=d.date;o.id=ORD.length;ORD.push(o)});d.purchases.forEach(p=>{p.d=d.date;p.id=PUR.length;PUR.push(p)});
+ d.expenses.forEach(e=>EXPR.push({d:d.date,a:e[0],ty:e[1],tx:e[2],w:e[3],s:e[4],doc:e[5]}));d.cash.forEach(e=>CASH.push({d:d.date,a:e[0],tx:e[1],i:e[2],o:e[3],w:e[4],doc:e[5]}));
+ d.danger.forEach(e=>DNG.push({d:d.date,r:e[0],c:e[1],t:e[2],s:e[3],todo:e[4]}));d.shifts.forEach(e=>SHF.push({d:d.date,n:e[0],c:e[1],o:e[2],cl:e[3],cash:e[4],card:e[5],diff:e[6],st:e[7]}));
+ (d.access||[]).forEach(e=>ACC.push({d:d.date,t:e[0],ty:e[1],who:e[2],code:e[3],st:e[4],by:e[5]}));(d.edits||[]).forEach(e=>EDT.push({d:d.date,t:e[0],by:e[1],ty:e[2],dty:e[3],n:e[4]}))});
+const CONS=[],INV=[],STOCK=new Map(),PRICES=META.prices||{};
+DAYS.forEach(d=>{(d.cons||[]).forEach(c=>CONS.push({d:d.date,st:c[0],p:c[1],q:c[2],s:c[3],ty:c[4]}));(d.inv||[]).forEach(c=>INV.push({d:d.date,st:c[0],p:c[1],q:c[2],s:c[3],doc:c[4]}))});
+(META.stock||[]).forEach(r=>STOCK.set(r[0]+'|'+r[1],{st:r[0],p:r[1],g:r[2],u:r[3],q:r[4],s:r[5]}));
+const RVM=(META.reviews||[]).find(x=>x.meta),RV=(META.reviews||[]).filter(x=>!x.meta);
+const MIN=DAYS[0].date,MAX=DAYS[DAYS.length-1].date;
+let S={a:MAX,b:MAX,metric:'rev',tab:0,waiter:null,q:'',stf:'all',ost:'Кухня склад',osup:'',ogrp:'',hz:3,win:7,need:true,small:false};
+const addDays=(d,n)=>{const x=new Date(d+'T00:00:00Z');x.setUTCDate(x.getUTCDate()+n);return x.toISOString().slice(0,10)};
+const diffDays=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5)+1;
+const inR=(d,a,b)=>d>=a&&d<=b;
+const wf=o=>!S.waiter||o.w===S.waiter;
+const orders=(a=S.a,b=S.b)=>ORD.filter(o=>inR(o.d,a,b)&&wf(o));
+const paid=o=>!o.np&&o.n>0;
+function kp(a,b){const os=orders(a,b),ps=paid?os.filter(paid):[];const rev=sum(os,o=>o.n),ch=ps.length,del=sum(os,o=>o.dt),aft=sum(os,o=>o.da),gross=sum(os,o=>o.g+o.dt);
+ const disc=sum(os,o=>o.dc),comp=sum(os.filter(o=>o.np),o=>o.g),cost=sum(os,o=>sum(o.l.filter(l=>l[4]==0),l=>l[5]));
+ const pu=sum(PUR.filter(p=>inR(p.d,a,b)&&p.st==='PROCESSED'),p=>p.sum);
+ const ex=sum(EXPR.filter(e=>inR(e.d,a,b)&&(e.ty==='EXPENSES'||e.ty==='OTHER_EXPENSES')&&!['Зарплата','Дивиденды'].includes(e.a)),e=>e.s);
+ const dg=DNG.filter(x=>inR(x.d,a,b));
+ return{rev,ch,avg:ch?rev/ch:0,gu:sum(ps,o=>o.gu),delp:pct(del,gross),del,aft,disc:disc+comp,disc0:disc,comp,pu,ex,dn:dg.length,red:dg.filter(x=>x.r==3).length,fc:pct(cost,rev)}}
+const CARDS=[
+ {id:'rev',t:'Выручка',v:k=>money(k.rev),n:k=>k.rev,day:d=>sum(d.orders.filter(o=>wf(o)),o=>o.n),g:1},
+ {id:'ch',t:'Чеков',v:k=>fmt(k.ch),n:k=>k.ch,day:d=>d.orders.filter(o=>wf(o)&&paid(o)).length,g:1},
+ {id:'avg',t:'Средний чек',v:k=>money(k.avg),n:k=>k.avg,day:d=>{const x=d.orders.filter(o=>wf(o)&&paid(o));return x.length?sum(x,o=>o.n)/x.length:0},g:1},
+ {id:'del',t:'Удалено (по меню)',v:k=>money(k.del),s:k=>k.delp.toFixed(1)+'% продаж · после печати '+money(k.aft),n:k=>k.del,day:d=>sum(d.orders.filter(wf),o=>o.dt),g:-1,cls:k=>k.aft>0||k.delp>8?'bad':k.delp>3?'warn':'ok'},
+ {id:'disc',t:'Скидки и комплименты',v:k=>money(k.disc),s:k=>'скидки '+money(k.disc0)+' · комплименты '+money(k.comp),n:k=>k.disc,day:d=>sum(d.orders.filter(wf),o=>o.dc+(o.np?o.g:0)),g:-1},
+ {id:'purch',t:'Закупки',v:k=>money(k.pu),s:k=>pct(k.pu,k.rev).toFixed(0)+'% выручки',n:k=>k.pu,day:d=>sum(d.purchases.filter(p=>p.st==='PROCESSED'),p=>p.sum),g:0},
+ {id:'exp',t:'Прочие расходы',v:k=>money(k.ex),n:k=>k.ex,day:d=>sum(d.expenses.filter(e=>(e[1]==='EXPENSES'||e[1]==='OTHER_EXPENSES')&&!['Зарплата','Дивиденды'].includes(e[0])),e=>e[4]),g:-1},
+ {id:'fc',t:'Food cost (расчётный)',v:k=>k.fc.toFixed(1)+'%',n:k=>k.fc,day:d=>{const os=d.orders.filter(wf),r=sum(os,o=>o.n);return r?sum(os,o=>sum(o.l.filter(l=>l[4]==0),l=>l[5]))/r*100:0},g:-1,cls:k=>k.fc>50?'bad':k.fc>42?'warn':'ok'},
+ {id:'dng',t:'Опасные операции',v:k=>fmt(k.dn),s:k=>'критических '+k.red,n:k=>k.dn,day:d=>d.danger.length,g:-1,cls:k=>k.red>0?'bad':k.dn>10?'warn':'ok'},
+ {id:'cash',t:'Деньги и смены',v:k=>fmt(SHF.filter(x=>inR(x.d,S.a,S.b)).length)+' смен',s:k=>'расхождений: '+SHF.filter(x=>inR(x.d,S.a,S.b)&&x.diff!=0).length,n:k=>0,day:d=>d.shifts.length,g:0},
+ {id:'rv',t:'Отзывы 2ГИС',v:k=>{const r=RV.filter(x=>inR(x.d,S.a,S.b));return fmt(r.length)+' отз.'},s:k=>{const r=RV.filter(x=>inR(x.d,S.a,S.b)),n=r.filter(x=>x.r<=4).length;return 'негативных '+n+(RVM?' · рейтинг '+RVM.meta.rating:'')},n:k=>RV.filter(x=>inR(x.d,S.a,S.b)).length,day:d=>RV.filter(x=>x.d===d.date).length,g:1,cls:k=>RV.filter(x=>inR(x.d,S.a,S.b)&&x.r<=4).length?'warn':'ok'},
+ {id:'order',t:'Заказ (норма)',v:k=>{const r=orderRows().filter(x=>x.need>0);return fmt(r.length)+' поз.'},s:k=>{const r=orderRows().filter(x=>x.need>0);return '≈'+money(sum(r,x=>x.cost))+' на '+S.hz+' дн. · '+esc(S.ost||'все склады')},n:k=>0,day:d=>sum((d.cons||[]).filter(c=>c[4]==1),c=>c[3]),g:0,cls:k=>orderRows().filter(x=>x.need>0&&x.cover!==null&&x.cover<1).length?'warn':'ok'},
+ {id:'inv',t:'Инвентаризации',v:k=>fmt(new Set(INV.filter(x=>inR(x.d,S.a,S.b)).map(x=>x.d+x.doc+x.st)).size)+' актов',s:k=>{const v=INV.filter(x=>inR(x.d,S.a,S.b));return 'недостачи '+money(sum(v.filter(x=>x.s<0),x=>x.s))+' · излишки +'+fmt(sum(v.filter(x=>x.s>0),x=>x.s))},n:k=>0,day:d=>sum((d.inv||[]),c=>Math.abs(c[3])),g:0},
+ {id:'acc',t:'Доступы и правки',v:k=>fmt(ACC.filter(x=>inR(x.d,S.a,S.b)).length)+' изм.',s:k=>'правок документов: '+EDT.filter(x=>inR(x.d,S.a,S.b)).length,n:k=>0,day:d=>(d.access||[]).length+(d.edits||[]).length,g:0}];
+function delta(c,k,kp_){if(!c.n||addDays(S.a,-diffDays(S.a,S.b))<MIN)return'';const a=c.n(k),b=c.n(kp_);if(!b)return'<span class="nt">—</span>';const p=(a/b-1)*100,good=c.g===0?null:(c.g>0?p>=0:p<=0);return`<span class="${good===null?'nt':good?'up':'dn'}">${p>=0?'▲':'▼'} ${Math.abs(p).toFixed(0)}% к прошлому периоду</span>`}
+function spark(c){const days=DAYS.filter(d=>d.date<=S.b).slice(-14);if(days.length<2)return'';const v=days.map(d=>c.day(d)),m=Math.max(...v)||1;const w=70,h=26;return`<svg class="spark" width="${w}" height="${h}">${v.map((x,i)=>`<rect x="${i*(w/v.length)}" y="${h-x/m*h}" width="${w/v.length-1}" height="${x/m*h}" fill="#9DB2D6"/>`).join('')}</svg>`}
+function renderCards(){const n=diffDays(S.a,S.b),pa=addDays(S.a,-n),pb=addDays(S.a,-1),k=kp(S.a,S.b),k0=kp(pa,pb);
+ $('#cards').innerHTML=CARDS.map(c=>`<div class="card ${c.cls?c.cls(k):''} ${S.metric===c.id?'act':''}" onclick="setMetric('${c.id}')"><h3>${c.t}</h3><div class="v">${c.v(k)}</div><div class="d">${delta(c,k,k0)}${c.s?`<div class="nt">${c.s(k)}</div>`:''}</div>${spark(c)}</div>`).join('')}
+function renderChart(){const c=CARDS.find(x=>x.id===S.metric)||CARDS[0];$('#chartTitle').textContent=c.t+' по дням';let days=DAYS.filter(d=>d.date<=addDays(S.b,0)&&d.date>=addDays(S.b,-29));const v=days.map(d=>c.day(d)),m=Math.max(...v)||1;
+ $('#bars').innerHTML=days.map((d,i)=>`<div class="${inR(d.date,S.a,S.b)?'cur':''}" style="height:${Math.max(2,v[i]/m*100)}%" title="${rus(d.date)}: ${c.id==='fc'||c.id==='del'&&0?v[i].toFixed(1):fmt(v[i])}" onclick="setRange('${d.date}','${d.date}')">${days.length<=16?`<span>${c.id==='fc'?v[i].toFixed(0)+'%':fmt(v[i]/(m>5e4?1000:1))+(m>5e4?'к':'')}</span>`:''}</div>`).join('');
+ $('#bx').innerHTML=days.map(d=>`<div>${d.date.slice(8)}<br>${WD[new Date(d.date+'T00:00:00Z').getUTCDay()]}</div>`).join('')}
+/* ---------- аккордеон ---------- */
+const REG={};let uid=0;
+function tbl(h,rows,opt={}){if(!rows.length)return'<div class="empty">Нет данных за выбранный период</div>';return`<table><thead><tr>${h.map((x,i)=>`<th class="${opt.n&&opt.n.includes(i)?'n':''}">${x}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table>`}
+function row(cells,child,opt={}){const id='r'+(uid++);if(child)REG[id]=child;return`<tr class="${child?'exp':''} ${opt.cls||''}" data-id="${id}" data-n="${cells.length}">${cells.map((c,i)=>`<td class="${opt.n&&opt.n.includes(i)?'n':''}">${c}</td>`).join('')}</tr>`}
+document.addEventListener('click',e=>{const a=e.target.closest('a.wt');if(a){S.waiter=a.dataset.w;renderAll();e.stopPropagation();return}
+ const dc=e.target.closest('a.doc');if(dc){openDoc(dc.dataset.t,+dc.dataset.i);e.stopPropagation();return}
+ const tr=e.target.closest('tr.exp');if(!tr||e.target.closest('a'))return;const nx=tr.nextElementSibling;
+ if(nx&&nx.classList.contains('det')){nx.remove();tr.classList.remove('open');return}
+ const d=document.createElement('tr');d.className='det';d.innerHTML=`<td colspan="${tr.dataset.n}">${REG[tr.dataset.id]()}</td>`;tr.after(d);tr.classList.add('open')});
+const W=w=>`<a class="wt" data-w="${esc(w)}" title="Фильтровать по официанту">${esc(w||'—')}</a>`;
+const DOC=o=>`<a class="doc" data-t="o" data-i="${o.id}">документ</a>`;
+const st=l=>l[4]==0?'':l[4]==3?'<span class="tag t-r">удалено ПОСЛЕ печати</span>':l[4]==2?'<span class="tag t-a">заказ удалён до печати</span>':'<span class="tag t-b">удалено до печати</span>';
+const linesT=o=>tbl(['Блюдо','Кол-во','Сумма по меню','Оплачено','Статус'],o.l.map(l=>row([esc(l[0]),l[1],money(l[2]),money(l[3]),st(l)],null,{n:[1,2,3],cls:l[4]?'badrow':''})),{n:[1,2,3]});
+function ordersT(os,opt={}){os=[...os].sort((a,b)=>(opt.by?opt.by(b)-opt.by(a):(a.d+a.t<b.d+b.t?-1:1)));const cut=os.length>150?os.slice(0,150):os;
+ return tbl(['Дата','Время','Стол','Гостей','Официант','Кассир','Сумма','Оплата','Флаги',''],cut.map(o=>row([rus(o.d),o.t+'–'+o.c,esc(o.tb),o.gu,W(o.w),esc(o.ca),opt.del?money(o.dt):money(o.n),esc(o.pay),flags(o),DOC(o)],()=>linesT(o),{n:[3,6]})),{n:[3,6]})+(os.length>cut.length?`<div class="note">Показано ${cut.length} из ${os.length} (по убыванию суммы). Сузьте период или используйте фильтр по официанту.</div>`:'')}
+function flags(o){let f='';if(o.da>0)f+='<span class="tag t-r">после печати</span>';if(o.dt>0&&!o.da)f+='<span class="tag t-b">удаления</span>';if(o.dc>0)f+='<span class="tag t-a">скидка</span>';if(o.np)f+='<span class="tag t-a">без оплаты</span>';if(o.bq)f+='<span class="tag t-g">банкет</span>';if(o.vip==1)f+='<span class="tag t-g">VIP пробит</span>';if(o.vip==2)f+='<span class="tag t-r">VIP удалён</span>';return f}
+/* ---------- документы ---------- */
+function openDoc(t,i){let h='';if(t==='o'){const o=ORD[i];h=`<h3>Чек · смена ${esc(o.k.split('|')[0])}, заказ №${esc(o.k.split('|')[1])}</h3><div class="note">${rus(o.d)} · стол ${esc(o.tb)} · ${o.t}–${o.c}</div><div class="kv"><div><span>Официант</span><br>${W(o.w)}</div><div><span>Кассир</span><br>${esc(o.ca)}</div><div><span>Гостей</span><br>${o.gu}</div><div><span>Оплата</span><br>${esc(o.pay)}</div><div><span>Сумма (оплачено)</span><br><b>${money(o.n)}</b></div><div><span>Скидка</span><br>${o.dc?money(o.dc)+' '+esc(o.dtp):'нет'}</div><div><span>Удалено</span><br>${o.dt?money(o.dt)+' (после печати '+money(o.da)+')':'нет'}</div><div><span>Аренда VIP</span><br>${['не требуется/нет','пробит и оплачен','пробит и УДАЛЁН'][o.vip]}</div></div>${linesT(o)}`}
+ else{const p=PUR[i];h=`<h3>Приходная накладная №${esc(p.doc)}</h3><div class="note">${rus(p.d)} · ${esc(p.sup)} · склад ${esc(p.store)} · ${p.st==='PROCESSED'?'проведена':'<b>'+esc(p.st)+'</b>'}</div><div class="kv"><div><span>Сумма</span><br><b>${money(p.sum)}</b></div><div><span>Позиций</span><br>${p.l.length}</div></div>${purLines(p)}`}
+ $('#doc').innerHTML=h;$('#modal').classList.add('on')}
+function closeDoc(){$('#modal').classList.remove('on')}$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeDoc()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDoc()});
+function chg(l){return l[6]===null||l[6]===undefined?'<span class="nt">нет истории</span>':`<span class="${l[6]>=10?'dn':l[6]<=-5?'up':'nt'}">${l[6]>0?'+':''}${l[6].toFixed(0)}%</span> <span class="nt">(было ${fmt(l[5])}${l[8]?' у '+esc(l[8]):''})</span>`}
+const purLines=p=>tbl(['Товар','Кол-во','Цена','Сумма','Изменение цены'],p.l.map(l=>row([esc(l[0]),l[2]+' '+esc(l[1]),money(l[3]),money(l[4]),chg(l)],null,{n:[1,2,3],cls:l[6]>=10?'badrow':''})),{n:[1,2,3]});
+/* ---------- заказ и инвентаризация ---------- */
+const uMap=new Map();PUR.forEach(p=>p.l.forEach(l=>{if(!uMap.has(l[0]))uMap.set(l[0],l[1])}));
+const roundQty=(q,u)=>/^(шт|уп|бут|пач|рул|пор|кор)/i.test(u||'')?Math.ceil(q-1e-9):Math.ceil(q*2-1e-9)/2;
+function supOf(st,p){const m=new Set();PUR.forEach(x=>{if((!st||x.store===st)&&x.st==='PROCESSED'&&x.l.some(l=>l[0]===p))m.add(x.sup)});return[...m]}
+function orderRows(){const a=addDays(MAX,-(S.win-1)),nd=Math.max(1,DAYS.filter(d=>d.date>=a).length),m=new Map();
+ CONS.filter(c=>c.d>=a&&(!S.ost||c.st===S.ost)).forEach(c=>{const k=c.st+'|'+c.p,x=m.get(k)||{st:c.st,p:c.p,q:0,sales:0,acts:0};x.q+=c.q;if(c.ty==1)x.sales+=c.q;else x.acts+=c.q;m.set(k,x)});
+ let rows=[...m.values()].filter(x=>x.q>0.0001).map(x=>{const stk=STOCK.get(x.st+'|'+x.p)||{q:0,u:uMap.get(x.p)||'',g:''},avg=x.q/nd,q0=Math.max(stk.q,0),norm=avg*S.hz,need=Math.max(0,norm-q0),u=stk.u||uMap.get(x.p)||'',pr=PRICES[x.st+'|'+x.p],ord=need>=(/^(шт|уп|бут|пач|рул|пор|кор)/i.test(u||'')?0.9:0.15)?roundQty(need,u):0,li=INV.filter(i=>i.st===x.st&&i.p===x.p).sort((y,z)=>y.d<z.d?1:-1)[0];
+  return{...x,u,g:stk.g,stock:stk.q,avg,norm,need:ord,cover:avg>0?q0/avg:null,price:pr?pr[1]:0,sup:pr?pr[0]:'',cost:ord*(pr?pr[1]:0),inv:li}});
+ if(S.ogrp)rows=rows.filter(x=>x.g===S.ogrp);if(S.osup){const set=new Set();PUR.forEach(p=>{if(p.st==='PROCESSED'&&p.sup===S.osup&&(!S.ost||p.store===S.ost))p.l.forEach(l=>set.add(l[0]))});rows=rows.filter(x=>set.has(x.p))}
+ if(!S.small)rows=rows.filter(x=>x.avg*(x.price||0)>=800||(!x.price&&x.avg>=1));
+ return rows.sort((a,b)=>(b.need>0)-(a.need>0)||((a.cover!==null&&a.cover<1)?0:1)-((b.cover!==null&&b.cover<1)?0:1)||b.cost-a.cost||(a.cover??99)-(b.cover??99))}
+function orderDetail(x){const days=DAYS.filter(d=>d.date>=addDays(MAX,-13)),v=days.map(d=>sum(CONS.filter(c=>c.d===d.date&&c.st===x.st&&c.p===x.p),c=>c.q)),mx=Math.max(...v)||1;
+ const bars=`<div class="bars" style="height:70px">${v.map((q,i)=>`<div style="height:${Math.max(3,q/mx*100)}%" title="${rus(days[i].date)}: ${q.toFixed(2)} ${esc(x.u)}"></div>`).join('')}</div><div class="bx">${days.map(d=>`<div>${d.date.slice(8)}</div>`).join('')}</div>`;
+ const buys=[];PUR.filter(p=>p.st==='PROCESSED'&&p.store===x.st).forEach(p=>p.l.forEach(l=>{if(l[0]===x.p)buys.push({p,l})}));buys.sort((a,b)=>a.p.d<b.p.d?1:-1);
+ const inv=INV.filter(i=>i.st===x.st&&i.p===x.p).sort((a,b)=>a.d<b.d?1:-1),other=[...STOCK.values()].filter(r=>r.p===x.p&&r.st!==x.st&&Math.abs(r.q)>1e-6);
+ return`<div class="kv"><div><span>Остаток в iiko</span><br><b>${(+x.stock).toFixed(2)} ${esc(x.u)}</b></div><div><span>Средний расход по продажам</span><br><b>${(x.sales/Math.max(1,DAYS.filter(d=>d.date>=addDays(MAX,-(S.win-1))).length)).toFixed(2)} ${esc(x.u)}/день</b></div><div><span>Списано актами</span><br>${x.acts.toFixed(2)} ${esc(x.u)} за ${S.win} дн.</div><div><span>Норма на ${S.hz} дн.</span><br>${x.norm.toFixed(2)} ${esc(x.u)}</div><div><span>Заказать</span><br><b>${x.need} ${esc(x.u)}</b></div><div><span>Хватит на</span><br>${x.cover===null?'—':x.cover.toFixed(1)+' дн.'}</div><div><span>Последний поставщик / цена</span><br>${esc(x.sup||'—')} · ${money(x.price)}</div><div><span>Сумма заказа</span><br>${money(x.cost)}</div></div>
+ <div class="note">Расход по дням (14 дней), ${esc(x.u)}</div>${bars}
+ <h3 style="margin:12px 0 4px;font-size:14px">Последние закупки</h3>${buys.length?tbl(['Дата','Поставщик','Кол-во','Цена','Изменение цены',''],buys.slice(0,8).map(b=>row([rus(b.p.d),esc(b.p.sup),b.l[2]+' '+esc(b.l[1]),money(b.l[3]),chg(b.l),`<a class="doc" data-t="p" data-i="${b.p.id}">накладная</a>`],null,{n:[2,3]})),{n:[2,3]}):'<div class="empty">Закупок в периоде данных нет</div>'}
+ <h3 style="margin:12px 0 4px;font-size:14px">Инвентаризации по товару</h3>${inv.length?tbl(['Дата','Акт','Корректировка','Сумма'],inv.map(i=>row([rus(i.d),'№'+esc(i.doc),`<span class="${i.q<0?'dn':'up'}">${i.q>0?'+':''}${i.q.toFixed(2)} ${esc(x.u)}</span>`,money(i.s)],null,{n:[2,3]})),{n:[2,3]}):'<div class="empty">Инвентаризаций в периоде данных не было</div>'}
+ ${other.length?`<div class="note">Этот товар есть и на других складах: ${other.map(r=>esc(r.st)+' '+r.q.toFixed(1)+' '+esc(r.u)).join('; ')}</div>`:''}`}
+function orderCopy(rows){const by={};rows.filter(x=>x.need>0).forEach(x=>{(by[x.sup||'Без поставщика']=by[x.sup||'Без поставщика']||[]).push(x)});return Object.entries(by).map(([k,v])=>k+':\n'+v.map(x=>'• '+x.p+' — '+x.need+' '+x.u).join('\n')).join('\n\n')}
+function copyOrder(){const t=orderCopy(orderRows());navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>alert('Заказ скопирован — можно отправлять поставщикам'),()=>prompt('Скопируйте:',t))||prompt('Скопируйте:',t)}
+function orderPanel(t){const stores=[...new Set(STOCK.size?[...STOCK.values()].map(r=>r.st):CONS.map(c=>c.st))].sort(),grps=[...new Set([...STOCK.values()].map(r=>r.g).filter(Boolean))].sort();
+ const sups=[...new Set(PUR.filter(p=>p.st==='PROCESSED'&&(!S.ost||p.store===S.ost)&&p.d>=addDays(MAX,-60)).map(p=>p.sup))].sort();
+ const sel=(id,opts,cur,all)=>`<select onchange="S['${id}']=this.value;renderDetail();renderCards()" style="padding:5px;border-radius:8px;border:1px solid var(--ln)"><option value="">${all}</option>${opts.map(o=>`<option ${o===cur?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+ const pill=(k,vals,lab)=>vals.map(v=>`<a class="${S[k]===v?'on':''}" onclick="S['${k}']=${v};renderDetail();renderCards()">${v} ${lab}</a>`).join('');
+ let rows=orderRows(),all=rows;if(S.need)rows=rows.filter(x=>x.need>0);
+ let h=`<div class="tabs" style="align-items:center"><span class="note">Склад:</span>${sel('ost',stores,S.ost,'Все склады')}<span class="note">Поставщик:</span>${sel('osup',sups,S.osup,'Все')}<span class="note">Группа:</span>${sel('ogrp',grps,S.ogrp,'Все')}</div>
+ <div class="tabs" style="align-items:center"><span class="note">Норма на:</span>${pill('hz',[2,3,5,7],'дн.')}<span class="note">Расход за:</span>${pill('win',[7,14,30],'дн.')}<a class="${S.need?'on':''}" onclick="S.need=!S.need;renderDetail()">Только к заказу</a><a class="${S.small?'on':''}" onclick="S.small=!S.small;renderDetail();renderCards()">Показать мелочь</a><a onclick="copyOrder()">📋 Скопировать заказ по поставщикам</a></div>
+ <div class="note">Расход считается по продажам (списание по техкартам) и актам за ${S.win} дн.; остаток — из iiko на момент формирования (${META.gen}). К заказу: ${all.filter(x=>x.need>0).length} поз. ≈ ${money(sum(all,x=>x.cost))}. Красным — запаса меньше суток.</div>`;
+ const line=x=>row([esc(x.p)+(x.inv?` <span class="tag ${x.inv.q<0?'t-r':'t-g'}" title="последняя инвентаризация ${rus(x.inv.d)}">инв. ${rus(x.inv.d).slice(0,5)} ${x.inv.q>0?'+':''}${x.inv.q.toFixed(1)}</span>`:''),(+x.stock).toFixed(1)+' '+esc(x.u),x.avg.toFixed(2)+' '+esc(x.u)+'/дн',x.norm.toFixed(1),x.need>0?`<b>${x.need} ${esc(x.u)}</b>`:'<span class="up">хватает</span>',x.cover===null?'—':`<span class="${x.cover<1?'dn':''}">${x.cover.toFixed(1)} дн</span>`,x.price?money(x.price):'—',x.need>0&&x.cost?money(x.cost):''],()=>orderDetail(x),{n:[1,2,3,4,5,6,7],cls:x.stock<0?'badrow':''});
+ const head=['Товар','Остаток','Ср. расход','Норма','Заказать','Хватит на','Цена','Сумма'];
+ if(t==0)h+=tbl(head,rows.slice(0,200).map(line),{n:[1,2,3,4,5,6,7]});
+ else{const by=group(rows.filter(x=>x.need>0),x=>x.sup||'Поставщик не определён');h+=tbl(['Поставщик','Позиций','Сумма заказа'],by.sort((a,b)=>sum(b[1],x=>x.cost)-sum(a[1],x=>x.cost)).map(([k,v])=>row([esc(k),v.length,money(sum(v,x=>x.cost))],()=>tbl(head,v.map(line),{n:[1,2,3,4,5,6,7]}),{n:[1,2]})),{n:[1,2]})}
+ return h}
+function invPanel(t){const iv=INV.filter(x=>inR(x.d,S.a,S.b));let h='<div class="note">Инвентаризации из проводок iiko: «+» излишек (насчитали больше, чем по учёту), «−» недостача. Диапазон дат — выбранный период; журнал ограничен периодом выгруженных данных.</div>';
+ if(t==0){const g=group(iv,x=>x.d+'|'+x.doc+'|'+x.st).sort((a,b)=>a[0]<b[0]?1:-1);h+=tbl(['Дата','Акт','Склад','Недостача','Излишек','Итог','Позиций'],g.map(([k,v])=>{const[d,doc,st]=k.split('|'),n=sum(v.filter(x=>x.s<0),x=>x.s),p=sum(v.filter(x=>x.s>0),x=>x.s);return row([rus(d),'№'+esc(doc),esc(st),`<span class="dn">${money(n)}</span>`,`<span class="up">+${fmt(p)}</span>`,money(n+p),v.length],()=>tbl(['Товар','Корректировка','Сумма'],[...v].sort((a,b)=>a.s-b.s).map(x=>row([esc(x.p),`<span class="${x.q<0?'dn':'up'}">${x.q>0?'+':''}${x.q.toFixed(2)} ${esc(uMap.get(x.p)||(STOCK.get(x.st+'|'+x.p)||{}).u||'')}</span>`,money(x.s)],null,{n:[1,2]})),{n:[1,2]}),{n:[3,4,5,6]})}),{n:[3,4,5,6]})}
+ else h+=tbl(['Товар','Склад','Недостача','Излишек','Итог','Актов'],group(iv,x=>x.st+'|'+x.p).sort((a,b)=>sum(a[1],x=>x.s)-sum(b[1],x=>x.s)).slice(0,120).map(([k,v])=>{const[st,p]=k.split('|'),n=sum(v.filter(x=>x.s<0),x=>x.s),pp=sum(v.filter(x=>x.s>0),x=>x.s);return row([esc(p),esc(st),`<span class="dn">${money(n)}</span>`,`<span class="up">+${fmt(pp)}</span>`,money(n+pp),v.length],()=>tbl(['Дата','Акт','Корректировка','Сумма'],v.sort((a,b)=>a.d<b.d?1:-1).map(x=>row([rus(x.d),'№'+esc(x.doc),(x.q>0?'+':'')+x.q.toFixed(2),money(x.s)],null,{n:[2,3]})),{n:[2,3]}),{n:[2,3,4,5]})}),{n:[2,3,4,5]});
+ return h}
+/* ---------- панели ---------- */
+const TABS={rev:['По дням','По официантам','По часам','По оплатам','По блюдам'],purch:['По поставщикам','По дням','По товарам','Изменения цен'],del:['По официантам','По кассирам','По блюдам','По дням','Все заказы с удалениями'],disc:['Скидки','Комплименты (без оплаты)'],exp:['По статьям','По дням'],cash:['Смены','Движение денег'],dng:['По категориям','По дням'],fc:['По блюдам'],acc:['Изменения прав','Правки документов']};
+TABS.rv=['Негативные (≤4)','Все отзывы'];TABS.order=['Заказ по складу','Заказ по поставщикам'];TABS.inv=['Акты инвентаризации','По товарам'];TABS.ch=TABS.rev;TABS.avg=TABS.rev;
+function group(a,f){const m=new Map();a.forEach(x=>{const k=f(x);(m.get(k)||m.set(k,[]).get(k)).push(x)});return[...m.entries()]}
+function panel(){const m=S.metric,c=CARDS.find(x=>x.id===m);let tabs=TABS[m]||[''],h=`<h2>${c.t}</h2>`;if(tabs.length>1)h+=`<div class="tabs">${tabs.map((t,i)=>`<a class="${S.tab===i?'on':''}" onclick="S.tab=${i};renderDetail()">${t}</a>`).join('')}</div>`;
+ const os=orders(),t=S.tab;let body='';
+ if(m==='rev'||m==='ch'||m==='avg'){
+  const cols=k=>[k,'Выручка','Чеков','Ср. чек','Доля'],tot=sum(os,o=>o.n);
+  const gr=(f,ford)=>tbl(cols('Группа'),group(os,f).sort((a,b)=>ford?ford(a,b):sum(b[1],o=>o.n)-sum(a[1],o=>o.n)).map(([k,v])=>{const r=sum(v,o=>o.n),c_=v.filter(paid).length;return row([k,money(r),c_,money(c_?r/c_:0),pct(r,tot).toFixed(0)+'%'],()=>ordersT(v),{n:[1,2,3,4]})}),{n:[1,2,3,4]});
+  if(t==0)body=gr(o=>o.d,(a,b)=>a[0]<b[0]?-1:1).replace('Группа','День').replace(/<td class="">(\d{4})-(\d\d)-(\d\d)/g,'<td class="">$3.$2.$1');
+  if(t==1)body=tbl(['Официант','Выручка','Чеков','Ср. чек','Доля'],group(os,o=>o.w).sort((a,b)=>sum(b[1],o=>o.n)-sum(a[1],o=>o.n)).map(([k,v])=>{const r=sum(v,o=>o.n),c_=v.filter(paid).length;return row([W(k),money(r),c_,money(c_?r/c_:0),pct(r,tot).toFixed(0)+'%'],()=>ordersT(v),{n:[1,2,3,4]})}),{n:[1,2,3,4]});
+  if(t==2)body=gr(o=>o.t.slice(0,2)+':00',(a,b)=>(+a[0].slice(0,2)+18)%24-(+b[0].slice(0,2)+18)%24).replace('Группа','Час открытия');
+  if(t==3)body=gr(o=>o.pay||'—').replace('Группа','Оплата');
+  if(t==4){const dm=new Map();os.forEach(o=>o.l.forEach(l=>{if(l[4]==0){const x=dm.get(l[0])||{q:0,s:0,c:0,os:new Set()};x.q+=l[1];x.s+=l[3];x.c+=l[5];x.os.add(o);dm.set(l[0],x)}}));
+   body=tbl(['Блюдо','Порций','Выручка','Себестоимость','FC'],[...dm.entries()].sort((a,b)=>b[1].s-a[1].s).slice(0,80).map(([k,x])=>row([esc(k),fmt(x.q),money(x.s),money(x.c),`<span class="${x.c/x.s>.55?'dn':''}">${pct(x.c,x.s).toFixed(0)}%</span>`],()=>ordersT([...x.os]),{n:[1,2,3,4]})),{n:[1,2,3,4]})}}
+ else if(m==='del'){const dl=os.filter(o=>o.dt>0),only=S.stf==='aft';h+=`<div class="tabs"><a class="${S.stf==='all'?'on':''}" onclick="S.stf='all';renderDetail()">Все удаления</a><a class="${only?'on':''}" onclick="S.stf='aft';renderDetail()">Только после печати</a></div>`;
+  const src=only?dl.filter(o=>o.da>0):dl,val=o=>only?o.da:o.dt,tot=sum(src,val),g=(f,name,fx)=>tbl([name,'Удалено','Заказов','% от продаж','До печати','После печати'],group(src,f).sort((a,b)=>sum(b[1],val)-sum(a[1],val)).map(([k,v])=>{const g_=sum(os.filter(o=>f(o)===k),o=>o.g+o.dt);return row([fx?fx(k):esc(k),money(sum(v,val)),v.length,pct(sum(v,val),g_).toFixed(0)+'%',money(sum(v,o=>o.dt-o.da)),money(sum(v,o=>o.da))],()=>ordersT(v,{del:1,by:val}),{n:[1,2,3,4,5]})}),{n:[1,2,3,4,5]});
+  if(t==0)body=g(o=>o.w,'Официант',W);if(t==1)body=g(o=>o.ca,'Кассир');if(t==3)body=g(o=>o.d,'День',rus);
+  if(t==2){const dm=new Map();src.forEach(o=>o.l.forEach(l=>{if(l[4]>0&&(!only||l[4]==3)){const x=dm.get(l[0])||{s:0,n:0,os:new Set()};x.s+=l[2];x.n++;x.os.add(o);dm.set(l[0],x)}}));body=tbl(['Блюдо','Удалено','Строк'],[...dm.entries()].sort((a,b)=>b[1].s-a[1].s).slice(0,80).map(([k,x])=>row([esc(k),money(x.s),x.n],()=>ordersT([...x.os],{del:1}),{n:[1,2]})),{n:[1,2]})}
+  if(t==4)body=ordersT(src,{del:1,by:val})}
+ else if(m==='disc'){const src=t==0?os.filter(o=>o.dc>0):os.filter(o=>o.np&&o.g>0);body=`<div class="note">${t==0?'Заказы со скидкой':'Заказы, закрытые без оплаты (комплименты/списание)'}. Всего: ${money(sum(src,o=>t==0?o.dc:o.g))}</div>`+ordersT(src,{by:o=>t==0?o.dc:o.g})}
+ else if(m==='purch'){const ps=PUR.filter(p=>inR(p.d,S.a,S.b)&&p.st==='PROCESSED'),tot=sum(ps,p=>p.sum),pdoc=p=>`<a class="doc" data-t="p" data-i="${p.id}">документ</a>`;
+  const docs=v=>tbl(['Дата','Накладная','Поставщик','Позиций','Сумма',''],v.map(p=>row([rus(p.d),'№'+esc(p.doc),esc(p.sup),p.l.length,money(p.sum),pdoc(p)],()=>purLines(p),{n:[3,4]})),{n:[3,4]});
+  if(t==0)body=tbl(['Поставщик','Сумма','Накладных','Доля'],group(ps,p=>p.sup).sort((a,b)=>sum(b[1],p=>p.sum)-sum(a[1],p=>p.sum)).map(([k,v])=>row([esc(k),money(sum(v,p=>p.sum)),v.length,pct(sum(v,p=>p.sum),tot).toFixed(0)+'%'],()=>docs(v),{n:[1,2,3]})),{n:[1,2,3]});
+  if(t==1)body=tbl(['День','Сумма','Накладных'],group(ps,p=>p.d).sort((a,b)=>a[0]<b[0]?-1:1).map(([k,v])=>row([rus(k),money(sum(v,p=>p.sum)),v.length],()=>docs(v),{n:[1,2]})),{n:[1,2]});
+  if(t==2||t==3){const ln=[];ps.forEach(p=>p.l.forEach(l=>ln.push({p,l})));const src=t==3?ln.filter(x=>x.l[6]!==null&&Math.abs(x.l[6])>=5):ln;
+   const lt=v=>tbl(['Дата','Поставщик','Кол-во','Цена','Сумма','Изменение цены',''],v.map(x=>row([rus(x.p.d),esc(x.p.sup),x.l[2]+' '+esc(x.l[1]),money(x.l[3]),money(x.l[4]),chg(x.l),pdoc(x.p)],null,{n:[2,3,4]})),{n:[2,3,4]});
+   body=tbl(['Товар','Закуплено','Сумма','Ср. цена','Δ цены (макс)'],group(src,x=>x.l[0]).sort((a,b)=>t==3?Math.abs(b[1].reduce((m_,x)=>Math.max(m_,Math.abs(x.l[6]||0)),0))-Math.abs(a[1].reduce((m_,x)=>Math.max(m_,Math.abs(x.l[6]||0)),0)):sum(b[1],x=>x.l[4])-sum(a[1],x=>x.l[4])).slice(0,100).map(([k,v])=>{const q=sum(v,x=>x.l[2]),s=sum(v,x=>x.l[4]),mx=v.reduce((m_,x)=>Math.abs(x.l[6]||0)>Math.abs(m_)?x.l[6]:m_,0);return row([esc(k),q.toFixed(1)+' '+esc(v[0].l[1]),money(s),money(q?s/q:0),mx?`<span class="${mx>=10?'dn':mx<=-5?'up':'nt'}">${mx>0?'+':''}${mx.toFixed(0)}%</span>`:'—'],()=>lt(v),{n:[1,2,3,4]})}),{n:[1,2,3,4]})}}
+ else if(m==='exp'){const ex=EXPR.filter(e=>inR(e.d,S.a,S.b)&&(e.ty==='EXPENSES'||e.ty==='OTHER_EXPENSES')),rows=v=>tbl(['Дата','За что / кому','Тип','Сумма','Документ'],v.map(e=>row([rus(e.d),esc(e.w||'—'),esc(e.tx),money(e.s),esc(e.doc)],null,{n:[3]})),{n:[3]});
+  if(t==0)body=tbl(['Статья','Сумма','Строк'],group(ex,e=>e.a).sort((a,b)=>sum(b[1],e=>e.s)-sum(a[1],e=>e.s)).map(([k,v])=>row([esc(k)+(['Зарплата','Дивиденды'].includes(k)?' <span class="tag">не в «прочих»</span>':''),money(sum(v,e=>e.s)),v.length],()=>rows(v),{n:[1,2]})),{n:[1,2]});
+  else body=tbl(['День','Сумма','Строк'],group(ex.filter(e=>!['Зарплата','Дивиденды'].includes(e.a)),e=>e.d).sort((a,b)=>a[0]<b[0]?-1:1).map(([k,v])=>row([rus(k),money(sum(v,e=>e.s)),v.length],()=>rows(v),{n:[1,2]})),{n:[1,2]})}
+ else if(m==='cash'){if(t==0)body=tbl(['Дата','Смена','Кассир','Откр–закр','Наличные','Карта','Расхождение','Статус'],SHF.filter(x=>inR(x.d,S.a,S.b)).map(x=>row([rus(x.d),'№'+x.n,esc(x.c),x.o+'–'+x.cl,money(x.cash),money(x.card),`<span class="${x.diff?'dn':''}">${money(x.diff)}</span>`,esc(x.st)],null,{n:[4,5,6],cls:x.diff?'badrow':''})),{n:[4,5,6]});
+  else{const cs=CASH.filter(e=>inR(e.d,S.a,S.b));body=tbl(['Счёт','Приход','Расход','Операций'],group(cs,e=>e.a).map(([k,v])=>row([esc(k),money(sum(v,e=>e.i)),money(sum(v,e=>e.o)),v.length],()=>tbl(['Вид','Приход','Расход'],group(v,e=>e.tx).map(([kk,vv])=>row([esc(kk),money(sum(vv,e=>e.i)),money(sum(vv,e=>e.o))],()=>tbl(['Дата','Описание','Приход','Расход'],vv.map(e=>row([rus(e.d),esc(e.w||'—'),money(e.i),money(e.o)],null,{n:[2,3]})),{n:[2,3]}),{n:[1,2]})),{n:[1,2]}),{n:[1,2,3]})),{n:[1,2,3]})}}
+ else if(m==='dng'){const dg=DNG.filter(x=>inR(x.d,S.a,S.b)),ic=r=>['','🟡','🟠','🔴'][r],items=v=>tbl(['Дата','Риск','Что','Сумма','Что проверить'],v.sort((a,b)=>b.r-a.r||b.s-a.s).map(x=>row([rus(x.d),ic(x.r),esc(x.t),x.s?money(x.s):'',esc(x.todo)],null,{n:[3]})),{n:[3]});
+  if(t==0)body=tbl(['Категория','Риск','Кол-во','Сумма'],group(dg,x=>x.c).sort((a,b)=>Math.max(...b[1].map(x=>x.r))-Math.max(...a[1].map(x=>x.r))||b[1].length-a[1].length).map(([k,v])=>row([esc(k),ic(Math.max(...v.map(x=>x.r))),v.length,money(sum(v,x=>x.s))],()=>items(v),{n:[2,3]})),{n:[2,3]});
+  else body=tbl(['День','Кол-во','🔴'],group(dg,x=>x.d).sort((a,b)=>a[0]<b[0]?-1:1).map(([k,v])=>row([rus(k),v.length,v.filter(x=>x.r==3).length],()=>items(v),{n:[1,2]})),{n:[1,2]})}
+ else if(m==='fc'){const dm=new Map();os.forEach(o=>o.l.forEach(l=>{if(l[4]==0){const x=dm.get(l[0])||{q:0,s:0,c:0,os:new Set()};x.q+=l[1];x.s+=l[3];x.c+=l[5];x.os.add(o);dm.set(l[0],x)}}));
+  body=tbl(['Блюдо','Порций','Выручка','Себестоимость','FC','Маржа'],[...dm.entries()].filter(([k,x])=>x.s>0).sort((a,b)=>b[1].c/b[1].s-a[1].c/a[1].s).filter(([k,x])=>x.s>15000).slice(0,80).map(([k,x])=>row([esc(k),fmt(x.q),money(x.s),money(x.c),`<span class="${x.c/x.s>.55?'dn':x.c/x.s<.35?'up':''}">${pct(x.c,x.s).toFixed(0)}%</span>`,money(x.s-x.c)],()=>ordersT([...x.os]),{n:[1,2,3,4,5]})),{n:[1,2,3,4,5]})+'<div class="note">Сортировка по себестоимости (проблемные блюда сверху); показаны блюда с выручкой от 15 000 ₸.</div>'}
+ else if(m==='rv'){const r=RV.filter(x=>inR(x.d,S.a,S.b)&&(t==1||x.r<=4)).sort((a,b)=>a.d+a.t<b.d+b.t?1:-1);body=(RVM?`<div class="note">Рейтинг 2ГИС: <b>${RVM.meta.rating}</b> · всего отзывов ${RVM.meta.total}</div>`:'')+(r.length?tbl(['Дата','Оценка','Автор','Отзыв'],r.map(x=>row([rus(x.d)+' '+x.t,`<span class="${x.r<=2?'dn':x.r<=4?'':'up'}">${'★'.repeat(x.r)}</span> ${x.r}/5`,esc(x.a),esc(x.x||'(без текста)')],null,{cls:x.r<=4?'badrow':''}))):'<div class="empty">За выбранный период '+(t==0?'негативных отзывов нет ✅':'отзывов нет')+'</div>')}
+ else if(m==='order')body=orderPanel(t);
+ else if(m==='inv')body=invPanel(t);
+ else if(m==='acc'){if(t==0)body=tbl(['Дата','Время','Кому','Право','Что сделали','Кто изменил'],ACC.filter(x=>inR(x.d,S.a,S.b)).map(x=>row([rus(x.d),x.t,esc(x.who||'—'),esc(x.code||x.ty),esc({ALLOW:'✅ разрешено',DENY:'⛔ запрещено',DEFAULT:'↺ по умолчанию'}[x.st]||x.ty),esc(x.by)],null)));
+  else body=tbl(['Дата','Время','Кто','Действие','Документ'],EDT.filter(x=>inR(x.d,S.a,S.b)).map(x=>row([rus(x.d),x.t,esc(x.by),esc(x.ty),esc(x.dty+' №'+x.n)],null)))+'<div class="note">Журнал событий iiko хранится ~2 месяца, более ранние периоды пусты.</div>'}
+ $('#detail').innerHTML=h+`<div id="tblwrap">${body}</div>`;applyQ()}
+function applyQ(){const q=S.q.toLowerCase();document.querySelectorAll('#tblwrap>table>tbody>tr:not(.det)').forEach(tr=>{const hit=!q||tr.textContent.toLowerCase().includes(q);tr.style.display=hit?'':'none';const n=tr.nextElementSibling;if(n&&n.classList.contains('det'))n.style.display=hit?'':'none'})}
+function renderDetail(){panel()}
+function renderAll(){$('#sub').textContent=`${rus(S.a)} – ${rus(S.b)} · данные: ${rus(MIN)} – ${rus(MAX)} · сформировано ${META.gen}`;$('#d0').value=S.a;$('#d1').value=S.b;$('#d0').min=$('#d1').min=MIN;$('#d0').max=$('#d1').max=MAX;
+ $('#chips').innerHTML=S.waiter?`<span class="chip">${esc(S.waiter)} <b onclick="S.waiter=null;renderAll()">×</b></span>`:'';
+ const r=[['Вчера',MAX,MAX],['7 дней',addDays(MAX,-6),MAX],['30 дней',addDays(MAX,-29),MAX],['Этот месяц',MAX.slice(0,8)+'01',MAX],['Всё',MIN,MAX]].filter(x=>x[1]>=MIN);
+ $('#ranges').innerHTML=r.map(x=>`<button class="${S.a===x[1]&&S.b===x[2]?'on':''}" onclick="setRange('${x[1]}','${x[2]}')">${x[0]}</button>`).join('');
+ renderCards();renderChart();renderDetail()}
+function setMetric(m){S.metric=m;S.tab=0;S.stf='all';renderAll();document.getElementById('detail').scrollIntoView({behavior:'smooth',block:'start'})}
+function setRange(a,b){S.a=a<MIN?MIN:a;S.b=b>MAX?MAX:b;renderAll()}
+$('#d0').onchange=e=>setRange(e.target.value,S.b<e.target.value?e.target.value:S.b);$('#d1').onchange=e=>setRange(S.a>e.target.value?e.target.value:S.a,e.target.value);$('#q').oninput=e=>{S.q=e.target.value;applyQ()};
+S.a=addDays(MAX,-6)<MIN?MIN:addDays(MAX,-6);renderAll();
+</script></body></html>

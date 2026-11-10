@@ -1,0 +1,11 @@
+.env
+state/
+outbox/
+logs/
+.venv/
+archive/*.png
+archive/*/
+archive/data/
+__pycache__/
+persist/
+*.pyc
