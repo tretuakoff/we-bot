@@ -97,8 +97,8 @@ def main():
         elif a.cmd == 'morning':
             run_dashboard(k, d, only, a.force)
             for c in MORNING:
+                if c == 'reviews' and not TWOGIS_BRANCH_ID: continue   # без ID филиала 2ГИС отчёт пустой
                 run_report(k, c, d, only, a.force)
-                if c == 'access': pass
         elif a.cmd == 'report': run_report(k, a.arg, d if a.date else (today() if a.arg == 'norm' else d), only, a.force)
         elif a.cmd == 'norm': run_report(k, 'norm', today(), only, a.force)
         elif a.cmd == 'access': run_report(k, 'access', today(), only, True, rolling=a.hours or 3)
