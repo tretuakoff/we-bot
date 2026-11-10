@@ -14,8 +14,11 @@ jobs:
       - id: p
         env: {TG_TOKEN: '${{ secrets.TG_TOKEN }}'}
         run: |
-          curl -s "https://api.telegram.org/bot$TG_TOKEN/getMe" | python3 -c "import sys,json; d=json.load(sys.stdin); print('бот: @' + d['result']['username'] if d.get('ok') else 'ошибка токена Telegram: ' + str(d.get('description')))" || true
-          N=$(curl -s "https://api.telegram.org/bot$TG_TOKEN/getUpdates?timeout=0&limit=1" | python3 -c "import sys,json;print(len(json.load(sys.stdin).get('result',[])))" || echo 0)
+          T=$(printf '%s' "$TG_TOKEN" | tr -d '[:space:]')
+          if printf '%s' "$T" | grep -Eq '^[0-9]+:[A-Za-z0-9_-]{30,}$'; then echo "формат токена: верный"; else echo "формат токена: НЕВЕРНЫЙ (длина ${#T}) — проверьте секрет TG_TOKEN"; fi
+          ME=$(curl -s --max-time 20 "https://api.telegram.org/bot$T/getMe" || true)
+          printf '%s' "$ME" | python3 -c "import sys,json; d=json.loads(sys.stdin.read() or '{}'); print('бот: @' + d['result']['username'] if d.get('ok') else 'Telegram не принял токен: ' + str(d.get('description', 'нет ответа')))"
+          N=$(curl -s --max-time 20 "https://api.telegram.org/bot$T/getUpdates?timeout=0&limit=1" | python3 -c "import sys,json; print(len(json.loads(sys.stdin.read() or '{}').get('result', [])))" || echo 0)
           echo "новых сообщений: $N"
           echo "pending=$N" >> $GITHUB_OUTPUT
   handle:
