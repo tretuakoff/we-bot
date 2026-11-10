@@ -24,7 +24,7 @@ def collect(k, d):
                 add(2 if s < 100000 else 3, 'Скидка', f'{r.open} ст.{r.TableNum} {pct(s / base * 100, 0)} «{r["OrderDiscount.Type"] or "ручная"}» · {short(r.waiter, 12)}/{short(r.cashier, 12)}', s, 'Основание и разрешивший скидку')
             if g.nopay.all() and base > 0: add(2 if base < 50000 else 3, 'Заказ без оплаты', f'{r.open} ст.{r.TableNum} {short(", ".join(list(dict.fromkeys(g.DishName))[:2]), 40)} · {short(r.waiter, 12)}', base, 'Комплимент по распоряжению? Кто разрешил')
         ret = pd.to_numeric(k.olap('SALES', ['Cashier'], ['DishReturnSum'], d, d + dt.timedelta(days=1)).get('DishReturnSum', pd.Series(dtype=float)), errors='coerce')
-        if len(ret) and ret.sum() > 0: add(3, 'Возвраты', f'Возвраты блюд за день', ret.sum(), 'Кто и по каким чекам')
+        if len(ret) and ret.sum() >= 1000: add(3, 'Возвраты', f'Возвраты блюд за день', ret.sum(), 'Кто и по каким чекам')
         # вынос, похожий на зал: без наценки за обслуживание 10%
         if TAKEAWAY_SECTION and 'RestaurantSection' in live:      # секция выноса задаётся в restaurants.json
             tk = live[live.RestaurantSection == TAKEAWAY_SECTION]
