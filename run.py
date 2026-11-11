@@ -95,7 +95,7 @@ def main():
                     print('архив', day)
                 except Exception as e: print('ошибка', day, e)
         elif a.cmd == 'morning':
-            run_dashboard(k, d, only, a.force)
+            # дашборд дня по всем Гастериям теперь шлёт Revisor (тот же бот @Gasteria_bot) — здесь только подробные отчёты
             for c in MORNING:
                 if c == 'reviews' and not TWOGIS_BRANCH_ID: continue   # без ID филиала 2ГИС отчёт пустой
                 run_report(k, c, d, only, a.force)
