@@ -32,7 +32,7 @@ jobs:
       WE_DATA_DIR: ${{ github.workspace }}/persist/data
       IIKO_ACCOUNTS: ${{ secrets.IIKO_ACCOUNTS }}
       TG_TOKEN: ${{ secrets.TG_TOKEN }}
-      ALLOWED_PHONES: ${{ secrets.ALLOWED_PHONES }}
+      ALLOWED_PHONES: "${{ secrets.ALLOWED_PHONES }},${{ secrets.ALLOWED_PHONES_EXTRA }}"
       ALLOWED_USERNAMES: ${{ secrets.ALLOWED_USERNAMES }}
     steps:
       - uses: actions/checkout@v4
